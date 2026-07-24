@@ -1,34 +1,16 @@
-// =====================================
-// MOBILE MENU
-// =====================================
-
-const menuBtn = document.getElementById("menuBtn");
-const navLinks = document.querySelector(".nav-links");
-
-if (menuBtn && navLinks) {
-
-    menuBtn.addEventListener("click", function () {
-
-        navLinks.classList.toggle("mobile-open");
-
-    });
-
-}
-
-
-// =====================================
+// ===============================
 // CART SYSTEM
-// =====================================
+// ===============================
 
 let cartCount = 0;
 
 const cartCounter = document.getElementById("cartCount");
 const toast = document.getElementById("toast");
 
-const addCartButtons =
-    document.querySelectorAll(".add-cart");
+const addCartButtons = document.querySelectorAll(".add-cart");
 
 
+// ADD PRODUCT TO CART
 addCartButtons.forEach(function (button) {
 
     button.addEventListener("click", function () {
@@ -37,19 +19,22 @@ addCartButtons.forEach(function (button) {
 
         cartCounter.textContent = cartCount;
 
-        button.innerHTML = "✓ Added to Cart";
+        button.textContent = "✓ Added to Cart";
 
         button.classList.add("added");
 
-        showToast(
-            "✓ Product added to cart!"
-        );
-
+        toast.textContent = "✓ Product added to cart!";
+        toast.classList.add("show");
 
         setTimeout(function () {
 
-            button.innerHTML =
-                "Add to Cart <span>+</span>";
+            toast.classList.remove("show");
+
+        }, 2000);
+
+        setTimeout(function () {
+
+            button.textContent = "Add to Cart +";
 
             button.classList.remove("added");
 
@@ -60,93 +45,118 @@ addCartButtons.forEach(function (button) {
 });
 
 
-// =====================================
-// TOAST MESSAGE
-// =====================================
+// ===============================
+// CART BUTTON
+// ===============================
 
-function showToast(message) {
+const cartBtn = document.getElementById("cartBtn");
 
-    if (!toast) return;
+cartBtn.addEventListener("click", function () {
 
-    toast.textContent = message;
+    if (cartCount === 0) {
 
-    toast.classList.add("show");
+        showCustomPopup(
+            "Your Cart is Empty",
+            "Please add some products to your cart first."
+        );
+
+        return;
+
+    }
+
+    showCartPopup();
+
+});
 
 
-    setTimeout(function () {
+// ===============================
+// CART POPUP
+// ===============================
 
-        toast.classList.remove("show");
+function showCartPopup() {
 
-    }, 2500);
+    const popup = document.createElement("div");
+
+    popup.className = "cart-popup-overlay";
+
+    popup.innerHTML = `
+
+        <div class="cart-popup">
+
+            <button class="close-popup">
+                ✕
+            </button>
+
+            <div class="popup-icon">
+                🛒
+            </div>
+
+            <h2>
+                Your Shopping Cart
+            </h2>
+
+            <p>
+                You have <strong>${cartCount}</strong> item(s) in your cart.
+            </p>
+
+            <button class="confirm-order-btn" id="confirmOrderBtn">
+
+                Confirm Order →
+
+            </button>
+
+        </div>
+
+    `;
+
+    document.body.appendChild(popup);
+
+
+    // CLOSE POPUP
+
+    popup.querySelector(".close-popup").addEventListener(
+        "click",
+        function () {
+
+            popup.remove();
+
+        }
+    );
+
+
+    // CONFIRM ORDER
+
+    popup.querySelector("#confirmOrderBtn").addEventListener(
+        "click",
+        function () {
+
+            popup.remove();
+
+            cartCount = 0;
+
+            cartCounter.textContent = "0";
+
+            showSuccessPopup();
+
+        }
+    );
 
 }
 
 
-// =====================================
-// ORDER CONFIRMATION SYSTEM
-// =====================================
+// ===============================
+// SUCCESS POPUP
+// ===============================
 
-const cartBtn =
-    document.getElementById("cartBtn");
+function showSuccessPopup() {
 
+    const popup = document.createElement("div");
 
-if (cartBtn) {
+    popup.className = "success-popup-overlay";
 
-    cartBtn.addEventListener("click", function () {
+    popup.innerHTML = `
 
-
-        if (cartCount === 0) {
-
-            alert(
-                "Your cart is empty. Please add a product first."
-            );
-
-            return;
-
-        }
-
-
-        const confirmOrder =
-            confirm(
-
-                "🛒 Cart Summary\n\n" +
-
-                "Total Products: " +
-                cartCount +
-
-                "\n\nDo you want to confirm your order?"
-
-            );
-
-
-        if (confirmOrder) {
-
-            showOrderSuccess();
-
-        }
-
-    });
-
-}
-
-
-// =====================================
-// ORDER SUCCESS POPUP
-// =====================================
-
-function showOrderSuccess() {
-
-    const successPopup =
-        document.createElement("div");
-
-
-    successPopup.className =
-        "order-success-popup";
-
-
-    successPopup.innerHTML = `
-
-        <div class="success-box">
+        <div class="success-popup">
 
             <div class="success-icon">
                 ✓
@@ -160,7 +170,7 @@ function showOrderSuccess() {
                 Thank you for shopping with ShopHub.
             </p>
 
-            <button id="closeSuccess">
+            <button id="successCloseBtn">
                 Continue Shopping
             </button>
 
@@ -168,330 +178,63 @@ function showOrderSuccess() {
 
     `;
 
-
-    document.body.appendChild(successPopup);
-
-
-    const closeSuccess =
-        document.getElementById("closeSuccess");
+    document.body.appendChild(popup);
 
 
-    closeSuccess.addEventListener(
-        "click",
-        function () {
+    document
+        .getElementById("successCloseBtn")
+        .addEventListener("click", function () {
 
-            successPopup.remove();
+            popup.remove();
 
-        }
-    );
-
-
-    cartCount = 0;
-
-    cartCounter.textContent = cartCount;
-
-
-    addCartButtons.forEach(function (button) {
-
-        button.innerHTML =
-            "Add to Cart <span>+</span>";
-
-        button.classList.remove("added");
-
-    });
+        });
 
 }
 
 
-// =====================================
-// WISHLIST
-// =====================================
+// ===============================
+// EMPTY CART / GENERAL POPUP
+// ===============================
 
-const heartButtons =
-    document.querySelectorAll(".heart");
+function showCustomPopup(title, message) {
 
+    const popup = document.createElement("div");
 
-heartButtons.forEach(function (heart) {
+    popup.className = "success-popup-overlay";
 
-    heart.addEventListener("click", function () {
+    popup.innerHTML = `
 
-        heart.classList.toggle("active");
+        <div class="success-popup">
 
+            <div class="success-icon">
+                🛒
+            </div>
 
-        if (
-            heart.classList.contains("active")
-        ) {
+            <h2>
+                ${title}
+            </h2>
 
-            heart.textContent = "♥";
+            <p>
+                ${message}
+            </p>
 
-            showToast(
-                "♥ Added to Wishlist!"
-            );
+            <button id="closeEmptyPopup">
+                Continue Shopping
+            </button>
 
-        } else {
+        </div>
 
-            heart.textContent = "♡";
+    `;
 
-            showToast(
-                "Removed from Wishlist"
-            );
-
-        }
-
-    });
-
-});
+    document.body.appendChild(popup);
 
 
-// =====================================
-// SEARCH BOX
-// =====================================
+    document
+        .getElementById("closeEmptyPopup")
+        .addEventListener("click", function () {
 
-const searchBtn =
-    document.getElementById("searchBtn");
+            popup.remove();
 
-
-const searchBox =
-    document.getElementById("searchBox");
-
-
-const searchInput =
-    document.getElementById("searchInput");
-
-
-const closeSearch =
-    document.getElementById("closeSearch");
-
-
-if (searchBtn && searchBox) {
-
-    searchBtn.addEventListener(
-        "click",
-        function () {
-
-            searchBox.classList.toggle("show");
-
-            searchInput.focus();
-
-        }
-    );
+        });
 
 }
-
-
-if (closeSearch) {
-
-    closeSearch.addEventListener(
-        "click",
-        function () {
-
-            searchBox.classList.remove("show");
-
-            searchInput.value = "";
-
-            filterProducts();
-
-        }
-    );
-
-}
-
-
-// =====================================
-// PRODUCT SEARCH
-// =====================================
-
-const productCards =
-    document.querySelectorAll(".product-card");
-
-
-function filterProducts() {
-
-    const searchValue =
-        searchInput.value
-            .toLowerCase()
-            .trim();
-
-
-    productCards.forEach(function (product) {
-
-
-        const productName =
-            product
-                .querySelector("h3")
-                .textContent
-                .toLowerCase();
-
-
-        const productCategory =
-            product
-                .querySelector("small")
-                .textContent
-                .toLowerCase();
-
-
-        if (
-
-            productName.includes(
-                searchValue
-            )
-
-            ||
-
-            productCategory.includes(
-                searchValue
-            )
-
-        ) {
-
-            product.style.display =
-                "block";
-
-        } else {
-
-            product.style.display =
-                "none";
-
-        }
-
-    });
-
-}
-
-
-if (searchInput) {
-
-    searchInput.addEventListener(
-        "input",
-        filterProducts
-    );
-
-}
-
-
-// =====================================
-// VIEW ALL PRODUCTS
-// =====================================
-
-const viewAllBtn =
-    document.getElementById("viewAllBtn");
-
-
-if (viewAllBtn) {
-
-    viewAllBtn.addEventListener(
-        "click",
-        function () {
-
-
-            productCards.forEach(
-                function (product) {
-
-                    product.style.display =
-                        "block";
-
-                }
-            );
-
-
-            document
-                .getElementById("products")
-                .scrollIntoView({
-
-                    behavior: "smooth"
-
-                });
-
-        }
-    );
-
-}
-
-
-// =====================================
-// USER ACCOUNT BUTTON
-// =====================================
-
-const userBtn =
-    document.getElementById("userBtn");
-
-
-if (userBtn) {
-
-    userBtn.addEventListener(
-        "click",
-        function () {
-
-            alert(
-
-                "Welcome to ShopHub! 👋\n\n" +
-
-                "Account feature coming soon."
-
-            );
-
-        }
-    );
-
-}
-
-
-// =====================================
-// SMOOTH SCROLL
-// =====================================
-
-const allLinks =
-    document.querySelectorAll(
-        "a[href^='#']"
-    );
-
-
-allLinks.forEach(function (link) {
-
-    link.addEventListener(
-        "click",
-        function (event) {
-
-
-            const targetId =
-                link.getAttribute("href");
-
-
-            if (
-
-                targetId !== "#"
-
-                &&
-
-                document.querySelector(
-                    targetId
-                )
-
-            ) {
-
-                event.preventDefault();
-
-
-                document
-                    .querySelector(targetId)
-                    .scrollIntoView({
-
-                        behavior: "smooth"
-
-                    });
-
-
-                if (navLinks) {
-
-                    navLinks.classList.remove(
-                        "mobile-open"
-                    );
-
-                }
-
-            }
-
-        }
-    );
-
-});
